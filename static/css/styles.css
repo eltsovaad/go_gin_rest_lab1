@@ -1,0 +1,42 @@
+body {
+    padding-top: 2rem;
+}
+header {
+    background-color: #a15088;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2rem;
+    display: flex;
+}
+nav {
+    margin: 0.5rem;
+}
+header * {
+    display: inline;
+}
+header li {
+    margin: 1rem;
+}
+header li a {
+    color: #d4d06a;
+    text-decoration: none;
+}
+.albums {
+    list-style: none;
+}
+.album {
+    margin-bottom: 1.5rem;
+}
+.title {
+    font-size: larger;
+    font-weight: 600;
+}
+.artist {
+    font-size: smaller;
+    font-weight: 200;
+    display: block;
+    margin-left: 1rem;
+}
+

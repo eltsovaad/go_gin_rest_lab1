@@ -1,0 +1,17 @@
+{{ define "albums/index.html" }}
+{{ template "base/header.html" . }}
+
+<h2>Лучшие альбомы всех времён</h2>
+
+<ul class="albums">
+  {{ range .albums }}
+  <li class="album">
+    <span class="title">{{ .Title }}: {{ .Review }}</span>
+    <span class="artist">{{ .Artist }}</span>
+
+  </li>
+  {{ end }}
+</ul>
+
+{{ template "base/footer.html" . }}
+{{ end }}
