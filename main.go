@@ -1,7 +1,22 @@
+// @title Albums API
+// @version 1.0
+// @description Swagger API for Golang Course Project.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name eltsova_ad
+// @contact.email eltsova.ad@gmail.com
+
+// @license.name MIT
+
+// Album model info
+// @Description Info about albums
+// @Description with its title, artist and my review
 package main
 
 import (
 	"fmt"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
@@ -9,12 +24,17 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_ "lab1/docs"
 )
 
 type Album struct {
-	ID     uint64
-	Title  string  `form:"title" json:"title"`
-	Artist string  `form:"artist" json:"artist"`
+	//ID in data base
+	ID uint64 `swaggerignore:"true"`
+	//Title of an album
+	Title string `form:"title" json:"title"`
+	//Artist (band's) name
+	Artist string `form:"artist" json:"artist"`
+	//My review for the album
 	Review float32 `form:"review" json:"review"`
 }
 
@@ -32,12 +52,15 @@ func setupRouter(r *gin.Engine, db *gorm.DB) {
 	r.Static("/static", "./static/")
 	r.LoadHTMLGlob("templates/**/*.html")
 	r.Use(connectDatabase(db))
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	r.GET("/albums", getJsonAlbums)
 	r.GET("/albums/:id", getJsonAlbumByID)
 	r.POST("/albums", postAlbums)
 	r.GET("/albums/new", albumNewGetHandler)
 	r.POST("/albums/new", albumNewPostHandler)
-	r.GET("/welcome/", albumIndexHandler)
+	r.GET("/welcome", albumIndexHandler)
 	r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/welcome/")
 	})
@@ -62,6 +85,13 @@ func albumIndexHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "albums/index.html", gin.H{"albums": albums})
 }
 
+// getJsonAlbums godoc
+// @Summary      Shows Albums as JSON
+// @Description  Shows all albums
+// @Produce      json
+// @Success      200  {object}  Album
+// @Failure      500  {int}  http.StatusInternalServerError
+// @Router       /albums [get]
 func getJsonAlbums(c *gin.Context) {
 	db := c.Value("database").(*gorm.DB)
 	var albums []Album
@@ -72,6 +102,14 @@ func getJsonAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
+// getJsonAlbums godoc
+// @Summary      Shows Albums as JSON
+// @Description  get Album by ID
+// @Produce      json
+// @Param        id query uint false "ID in DB"
+// @Success      200  {object}  Album
+// @Failure      404  {int}  http.StatusNotFound
+// @Router       /albums/{id} [get]
 func getJsonAlbumByID(c *gin.Context) {
 	db := c.Value("database").(*gorm.DB)
 	var album Album
@@ -115,6 +153,18 @@ func albumNewGetHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "albums/new.html", gin.H{})
 }
 
+// postAlbums godoc
+// @Summary      Adds album to the DB
+// @Description  post json with album
+// @Accept       json
+// @Produce      json
+// @Param        title body string true "Title of an album"
+// @Param        artist body string true "Artist"
+// @Param        review body float32 true "My review mark"
+// @Success      200  {object}  Album
+// @Failure      404  {int}  http.StatusNotFound
+// @Failure      500  {int}  http.StatusInternalServerError
+// @Router       /albums [post]
 func postAlbums(c *gin.Context) {
 	var newAlbum Album
 	fmt.Printf("\nWe are in post Alb\n")
@@ -133,6 +183,7 @@ func postAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
+// @BasePath docs/v1
 func main() {
 	db, err := gorm.Open(sqlite.Open("lab1.db"), &gorm.Config{})
 	if err != nil {
