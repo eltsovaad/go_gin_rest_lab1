@@ -120,9 +120,13 @@ func getJsonAlbumByID(c *gin.Context) {
 		return
 	}
 
-	db.Where(&Album{ID: id}).First(&album)
-	if &album == nil {
+	rez := db.Where(&Album{ID: id}).First(&album)
+	if rez.RowsAffected == 0 {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+		return
+	}
+	if rez.Error != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "error occurred"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, album)
